@@ -1,11 +1,21 @@
 
 var renderer = new frampton.Renderer({
-  mediaConfig: mediaConfig
+  mediaConfig: mediaConfig,
+  videoSourceMaker: function(filename) {
+    return '/source/' + filename;
+  }
 });
 
 var tagger = new frampton.Tagger(mediaConfig);
 
-var tags = ['bus', 'construction', 'fountain', 'ocean'];
+var tags = [
+  'bus', 'bus', 'bus', 'bus', 'bus',
+  'construction', 'construction', 'construction', 'construction', 'construction', 'construction', 'construction', 'construction', 'construction', 'construction',
+  'bird', 'bird', 'bird',
+  'food', 'food',
+  'hardcore', 'hardcore', 'hardcore',
+  'car', 'car', 'car', 'car'
+];
 tags.forEach(function(tag) {
   tagger.tagVideosWithPattern(tag, tag);
 });
@@ -23,7 +33,7 @@ function scheduleNewSegment(delay) {
   alterTime(segment);
 
   segment.onStart = function() {
-    var delayBetweenVideos = Math.random() * 5000 + 500;
+    var delayBetweenVideos = 250 + Math.pow(Math.random(), 3) * 8000;
     var nextDelay = segment.msDuration() + delayBetweenVideos;
     scheduleNewSegment(nextDelay);
   };
@@ -32,30 +42,39 @@ function scheduleNewSegment(delay) {
 }
 
 function alterPosition(segment, style) {
+  var left, top, width;
   switch (style) {
     case 'left':
-      segment.setLeft('10%').setTop('10%').setWidth('50%');
+      left = Math.random() * 7.5 + 5;
+      top = Math.random() * 7.5 + 5;
+      width = 50;
       break;
 
     case 'center':
-      segment.setLeft('10%').setTop('15%').setWidth('80%');
+      width = Math.random() * 15 + 80;
+      left = (100 - width) / 2;
+      top = left;
       break;
 
     case 'right':
-      segment.setLeft('40%').setTop('50%').setWidth('50%');
+      left = Math.random() * 7.5 + 36.5;
+      top = Math.random() * 7.5 + 26.5;
+      width = 50;
       break;
-
-    default: break;
   }
+
+  segment.setLeft(left + '%').setTop(top + '%').setWidth(width + '%');
 }
 
 function alterTime(segment) {
-  var maxDuration = Math.max(segment.getDuration(), 6.666);
-  var minDuration = 0.3;
-  var duration = Math.random() * (maxDuration - minDuration) + minDuration;
+  var maxDuration = Math.min(segment.getDuration(), 10);
+  var minDuration = 0.35;
+  var duration = Math.pow(Math.random(), 2.1) * (maxDuration - minDuration) + minDuration;
 
   var maxStartTime = segment.getDuration() - duration;
   var startTime = Math.random() * maxStartTime;
+
+  console.log(`start: ${startTime}; duration: ${duration}`);
 
   segment.setDuration(duration).setStartTime(startTime);
 }
