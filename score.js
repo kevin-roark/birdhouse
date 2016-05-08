@@ -2,7 +2,7 @@
 var renderer = new frampton.Renderer({
   mediaConfig: mediaConfig,
   videoSourceMaker: function(filename) {
-    return '/source/' + filename;
+    return '/source-converted/' + filename;
   }
 });
 
